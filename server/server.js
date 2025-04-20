@@ -1,11 +1,13 @@
-require("dotenv").config();
-const express = require("express");
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/mongoDB.js";
 
-const cors = require("cors");
-const mongoose = require("mongoose");
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+connectDB();
 const MONGO_URI = process.env.MONGO_URI;
 
 cors({
@@ -15,17 +17,9 @@ cors({
 });
 
 app.use(express.json());
-
-// DataBase Connection
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("MongoDB is Connected Successfully"))
-  .catch((e) => console.log(e));
-app.use((err, req, res, next) => {
-  console.log(err.stack);
-  res.status(500).json({ success: false, message: "Something went Wrong" });
-});
-
+app.use(cookieParser());
+app.use(cors({ credentials: true }));
+app.get("/", (req, res) => res.send("Api Working"));
 app.listen(PORT, () => {
   console.log(`Server is now Running at PORT ${PORT} `);
 });
